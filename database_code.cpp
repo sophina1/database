@@ -1,49 +1,53 @@
-// DESCRIPTION OF CODE
+/*
+C++ program that performs three operations:
+1) Add a new employee
+2) Get employee information
+3) List all employees
+*/
 #include <iostream>
 #include <fstream>
 #include <string>
 using namespace std;
 
-// Declare variables for accessing the file and filename.
 fstream file;
 string filename = "data.txt";
 
-// Declare a struct to save the data.
 struct Person {
     string id, firstName, lastName;
     int income;
 };
 
-// Write function that takes an employee id and searches for that employee in the file
+// Function that takes an employee id and searches for that employee in the file
 struct Person *search(string id) {
 	struct Person *p2 = new Person;
-	char empId[6], firstName[15], lastName[15], incomeStr[10];
+	char empId[5], firstName[15], lastName[15], incomeStr[10];
 	file.clear();
 	file.seekg(0, ios::beg);
 	while (file.read(empId, 5)) {
 		empId[5] = '\0';
 		p2->id = empId;
         if (p2->id == id) {
-        	// Reading rest of data
-        	file.read(firstName, 15); // read 15 chars
-        	file.read(lastName, 15); // read 15 chars
-        	file.read(incomeStr, 10); // read 10 chars
-        	// Save to structure Person
+        	file.read(firstName, 15); 
+        	file.read(lastName, 15); 
+        	file.read(incomeStr, 10);
         	p2->firstName = firstName;
         	p2->lastName = lastName;
         	p2->income = stof(incomeStr); // convert incomeStr to float
         	return p2; // return pointer to Person struct
 		}
-		file.seekg(40, ios::cur); // why 40?
-        //where file.seekg uses 40 bytes from current file position. Explain why it is 40? 
-        // It is 40 because there are 40bytes of data for the first name, last name, and income.
+		file.seekg(40, ios::cur);
+        // Why it is 40? 
+		/*
+		The file.seekg uses 40-bytes from current file position because since the function intially
+		reads only the 5-byte employee ID, when the ID entered is not found, it needs to skip over
+		the remaning 40-bytes of data (firstname(15), lastname(15), and income(10) = 40) in the record
+		before reading another ID.
+		*/
     	}
     	return 0;
 } 
 
-///ANSWERT QUESTION ABOVE
-
-// Write function that retrieves employee information from employee id entered by user
+// Function that retrieves employee information from employee id entered by user
 void get_employee() {
 	string empId;
     cout << "Enter Employee ID: ";
@@ -59,25 +63,23 @@ void get_employee() {
         cout << "Income: " << employee->income << "\n";
     }
 }
-// Write function that lists all employees’ information
+
+// Function that lists all employees’ information
 void list() {
 	char id[6], firstName[15], lastName[15], incomeStr[10];
 	file.clear();
 	file.seekg(0, ios::beg); // rewind file to begining
 	while (file.read(id, 5)) {
-		// read rest of data
 		file.read(firstName, 15);
 		file.read(lastName, 15);
 		file.read(incomeStr, 10);
-		// save data to Person struct
 		float income = atof(incomeStr); // convert string to float
-		// display Person struct (record)
 		cout << id << " " << firstName << " " << lastName << " " << income << endl;
     }
 }
-// Write function that stores data into the file
+
+// Function that stores data into the file
 void write_data(Person p) {
-	// write data to file:
 	file.clear();
 	file.write(p.id.c_str(), 5); // write 5 chars for id
 	file.write(p.firstName.c_str(), 15); // write 15 chars for first name
@@ -86,7 +88,7 @@ void write_data(Person p) {
 	file.flush();
 }
 
-// Write function that asks user about a new employee data and call write_data to save the data into the file:
+// Function that asks user about a new employee data and call write_data to save the data into the file
 void new_employee() {
 	string empId;
 	while (1) {
